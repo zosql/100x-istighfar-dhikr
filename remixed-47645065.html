@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasbih Counter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            color: #333;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px 25px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .dhikr-section {
+            margin-bottom: 15px;
+            padding: 5px;
+            background: rgba(76, 175, 80, 0.05);
+            border-radius: 15px;
+        }
+
+        .arabic-text {
+            font-family: 'Amiri', serif;
+            font-size: 1.8rem;
+            line-height: 1.8;
+            color: #2E7D32;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .transliteration {
+            font-style: italic;
+            font-size: 1.1rem;
+            color: #424242;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .translation {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .gujarati-translation {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 0px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .reflection {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.5;
+            margin-top: 30px;
+        }
+
+        .counter-section {
+            margin-bottom: 20px;
+        }
+
+        .counter-display {
+            font-size: 4rem;
+            font-weight: 600;
+            color: #4CAF50;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 10px;
+            border-radius: 15px;
+            background: rgba(76, 175, 80, 0.05);
+            border: 2px dashed #4CAF50;
+        }
+
+        .counter-display:hover {
+            background: rgba(76, 175, 80, 0.15);
+            transform: scale(1.02);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #66BB6A);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .auto-indicator {
+            font-size: 0.9rem;
+            color: #4CAF50;
+            margin-top: 10px;
+            font-style: italic;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .auto-indicator.active {
+            opacity: 1;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: row;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .btn {
+            padding: 10px 8px;
+            border: none;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 0px;
+            text-transform: uppercase;
+            letter-spacing: 0.1px;
+            flex: 1;
+            max-width: 150px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #FF9800, #FFB74D);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #F44336, #EF5350);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .completion-screen {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .completion-screen.active {
+            display: block;
+        }
+
+        .completion-message {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #4CAF50;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .completion-arabic {
+            font-family: 'Amiri', serif;
+            font-size: 3rem;
+            color: #2E7D32;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .sparkle {
+            font-size: 2rem;
+            margin: 20px 0;
+            animation: sparkle 2s infinite;
+        }
+
+        .attribution {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 15px;
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.1); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+
+            .arabic-text {
+                font-size: 1.5rem;
+            }
+
+            .counter-display {
+                font-size: 3rem;
+            }
+
+            .completion-message {
+                font-size: 2rem;
+            }
+
+            .completion-arabic {
+                font-size: 2.5rem;
+            }
+
+            .btn {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+                max-width: 140px;
+            }
+
+            .button-group {
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 15px;
+                margin: 5px;
+            }
+
+            .arabic-text {
+                font-size: 1.3rem;
+            }
+
+            .counter-display {
+                font-size: 2.5rem;
+            }
+
+            .completion-message {
+                font-size: 1.8rem;
+            }
+
+            .completion-arabic {
+                font-size: 2rem;
+            }
+
+            .btn {
+                padding: 10px 12px;
+                font-size: 0.8rem;
+                max-width: 120px;
+            }
+
+            .button-group {
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="mainContent">
+            <div class="dhikr-section">
+                <div class="arabic-text">
+                    سُبْحَانَ رَبِّيَ الْعَظِيمِ وَبِحَمْدِهِ أَسْتَغْفِرُ اللهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ
+                </div>
+                <div class="transliteration">
+                    Subḥāna rabbiyal-'aẓīmi wa biḥamdih, astaghfirullāhal-'aẓīm wa atūbu ilayh
+                </div>
+                <div class="translation">
+                    Glory is to my Lord, the Supreme, and with His praise, I seek forgiveness from Allah, the Supreme, and I repent to Him.
+                </div>
+                <div class="gujarati-translation">
+                    મારા રબ મહાન છે અને તેની પ્રશંસા સાથે, હું અલ્લાહ મહાનની પાસે માફી માંગું છું અને તેની તરફ પસ્તાવો કરું છું.
+                </div>
+
+            </div>
+
+            <div class="counter-section">
+                <div class="counter-display" id="counterDisplay" onclick="manualCount()">0</div>
+                <div class="auto-indicator" id="autoIndicator">Auto counting active</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" id="autoBtn" onclick="toggleAutoCount()">Auto Count</button>
+                <button class="btn btn-danger" id="restartBtn" onclick="restartCounter()">Restart</button>
+            </div>
+
+            <div class="reflection">
+                This is a comprehensive dhikr: it combines <strong><em>tanzīh</em></strong>, <strong><em>taḥmīd</em></strong>, <strong><em>istighfār</em></strong>, and <strong><em>tawbah</em></strong> in one act — praise, transcendence, repentance, and return.<br><br>
+                <strong>આ એક સર્વાંગી ધિક્ર છે</strong>: તેમાં <strong>તન્ઝીહ</strong> (અલ્લાહની પવિત્રતા), <strong>તહ્મીદ</strong> (અલ્હાની પ્રશંસા), <strong>ઇસ્તિગફાર</strong> (માફી માંગવી), અને <strong>તૌબા</strong> (પસ્તાવો કરીને પરત ફરી જવું) — ચારેય કાર્ય એક જ ક્રિયામાં ભેગાં થાય છે.
+            </div>
+        </div>
+
+        <div class="completion-screen" id="completionScreen">
+            <div class="sparkle">✨ ✨ ✨</div>
+            <div class="completion-message">
+                May Allah accept your dhikr
+            </div>
+            <div class="completion-arabic">
+                لا إلهَ إلاَّ اللهُ
+            </div>
+            <div class="transliteration" style="margin-top: 20px; font-size: 1.2rem;">
+                Lā ilāha illallāh
+            </div>
+            <div class="translation" style="margin-top: 15px; font-size: 1.1rem;">
+                There is no god but Allah
+            </div>
+            <div class="gujarati-translation" style="margin-top: 15px; font-size: 1.1rem;">
+                અલ્લાહ સિવાય કોઈ ઇબાદત લાયક નથી
+            </div>
+            <div class="sparkle">✨ ✨ ✨</div>
+        </div>
+
+        <div class="attribution">
+            Built by Zoyeb Batliwala from India.<br>
+            Seeking prayers of fellow believers 🤲
+        </div>
+    </div>
+
+    <script>
+        let count = 0;
+        let autoInterval = null;
+        let isAutoCounting = false;
+        const maxCount = 100;
+        const dhikrDuration = 5000; // 5 seconds for auto counting
+        let firstCount = true;
+
+        const counterDisplay = document.getElementById('counterDisplay');
+        const progressFill = document.getElementById('progressFill');
+        const autoBtn = document.getElementById('autoBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const mainContent = document.getElementById('mainContent');
+        const completionScreen = document.getElementById('completionScreen');
+        const autoIndicator = document.getElementById('autoIndicator');
+
+        function updateDisplay() {
+            counterDisplay.textContent = count;
+            const progressPercentage = (count / maxCount) * 100;
+            progressFill.style.width = progressPercentage + '%';
+        }
+
+        function incrementCount() {
+            if (count < maxCount) {
+                count++;
+                updateDisplay();
+                
+                // Add a subtle animation effect
+                counterDisplay.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    counterDisplay.style.transform = 'scale(1)';
+                }, 150);
+                
+                if (count >= maxCount) {
+                    // Show completion screen after a 6-second delay to allow the 100th count to be visible and dhikr to be completed
+                    setTimeout(() => {
+                        showCompletionScreen();
+                    }, 6000);
+                }
+            }
+        }
+
+        function manualCount() {
+            if (count < maxCount) {
+                // Stop auto counting when manually clicking
+                if (isAutoCounting) {
+                    stopAutoCount();
+                }
+                incrementCount();
+            }
+        }
+
+        function toggleAutoCount() {
+            if (count >= maxCount) return;
+            
+            if (isAutoCounting) {
+                stopAutoCount();
+            } else {
+                startAutoCount();
+            }
+        }
+
+        function startAutoCount() {
+            if (count >= maxCount) return;
+            
+            isAutoCounting = true;
+            autoBtn.textContent = 'Stop Auto';
+            autoBtn.classList.remove('btn-primary');
+            autoBtn.classList.add('btn-secondary');
+            autoIndicator.classList.add('active');
+            firstCount = true;
+            
+            // First count happens immediately
+            if (count < maxCount) {
+                incrementCount();
+                firstCount = false;
+            }
+            
+            autoInterval = setInterval(() => {
+                if (count < maxCount) {
+                    incrementCount();
+                } else {
+                    stopAutoCount();
+                }
+            }, dhikrDuration);
+        }
+
+        function stopAutoCount() {
+            isAutoCounting = false;
+            autoBtn.textContent = 'Auto Count';
+            autoBtn.classList.remove('btn-secondary');
+            autoBtn.classList.add('btn-primary');
+            autoIndicator.classList.remove('active');
+            firstCount = true;
+            
+            if (autoInterval) {
+                clearInterval(autoInterval);
+                autoInterval = null;
+            }
+        }
+
+        function restartCounter() {
+            count = 0;
+            updateDisplay();
+            firstCount = true;
+            
+            // Stop auto counting
+            stopAutoCount();
+            
+            // Hide completion screen if visible
+            mainContent.style.display = 'block';
+            completionScreen.classList.remove('active');
+        }
+
+        function showCompletionScreen() {
+            stopAutoCount();
+            
+            mainContent.style.display = 'none';
+            completionScreen.classList.add('active');
+            
+            // Auto-return to main screen after 10 seconds
+            setTimeout(() => {
+                restartCounter();
+            }, 10000);
+        }
+
+        // Add smooth transitions
+        counterDisplay.style.transition = 'transform 0.15s ease';
+        
+        // Initialize display
+        updateDisplay();
+
+        // Add keyboard support
+        document.addEventListener('keydown', function(event) {
+            if (event.code === 'Space' && count < maxCount) {
+                event.preventDefault();
+                // Stop auto counting when using manual space bar
+                if (isAutoCounting) {
+                    stopAutoCount();
+                }
+                incrementCount();
+            } else if (event.key === 'Enter') {
+                event.preventDefault();
+                toggleAutoCount();
+            } else if (event.key === 'Escape') {
+                event.preventDefault();
+                restartCounter();
+            }
+        });
+    </script>
+</body>
+</html>
